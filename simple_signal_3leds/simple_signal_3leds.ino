@@ -10,7 +10,8 @@
 #define NORMAL_MODE 0
 #define EMERGENCY_MODE 1
 
-#define CYCLE_SLEEP 200
+#define READ_SLEEP 10
+#define READS_PER_CYCLE 20
 
 #define NORMAL_CYCLES_COUNT 4
 #define EMERGENCY_CYCLES_COUNT 2
@@ -27,6 +28,8 @@ int lastButtonState;
 int* cycles;
 int* delays;
 int cyclesCount;
+int currentRead;
+int modeSwitch;
 
 void setup() {
   // put your setup code here, to run once:
@@ -40,6 +43,7 @@ void setup() {
   delays=normalDelays;
   currentCycle=0;
   currentPhase=0;
+  currentRead=0;
   lastButtonState=digitalRead(PIN_4);
 }
 
@@ -61,26 +65,34 @@ void toggleMode() {
     cycles=normalCycles;
     delays=normalDelays;
   }
-
   currentCycle=0;
   currentPhase=0;
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  buttonPressed = digitalRead(PIN_4);
-  if (buttonPressed && !lastButtonState) {
-    toggleMode();
-  }
-  lastButtonState = buttonPressed;
   if (currentCycle>cyclesCount-1) {
     currentCycle=0;
   }
   toggleLEDs(cycles[currentCycle]);
-  delay(CYCLE_SLEEP);
-  currentPhase++;
-  if (currentPhase>delays[currentCycle]) {
-    currentPhase=0;
-    currentCycle++;
+
+  modeSwitch=0;
+  for (currentRead=0; currentRead<READS_PER_CYCLE; currentRead++) {
+    buttonPressed = digitalRead(PIN_4);
+    if (buttonPressed && !lastButtonState) {
+      modeSwitch=1;
+    }
+    lastButtonState = buttonPressed;
+    delay(READ_SLEEP);    
+  }
+
+  if (modeSwitch) {
+    toggleMode();
+  } else {
+    currentPhase++;
+    if (currentPhase>delays[currentCycle]) {
+      currentPhase=0;
+      currentCycle++;
+    }  
   }
 }
