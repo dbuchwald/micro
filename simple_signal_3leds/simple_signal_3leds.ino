@@ -1,6 +1,7 @@
 #define PIN_0 0
 #define PIN_1 1
 #define PIN_2 2
+#define PIN_3 3
 #define PIN_4 4
 
 #define RED_LED 4
@@ -11,7 +12,7 @@
 #define EMERGENCY_MODE 1
 
 #define READ_SLEEP 10
-#define READS_PER_CYCLE 20
+#define MAX_READS_PER_CYCLE 40
 
 #define NORMAL_CYCLES_COUNT 4
 #define EMERGENCY_CYCLES_COUNT 2
@@ -29,6 +30,7 @@ int* cycles;
 int* delays;
 int cyclesCount;
 int currentRead;
+int currentReadsCount;
 int modeSwitch;
 
 void setup() {
@@ -44,6 +46,7 @@ void setup() {
   currentCycle=0;
   currentPhase=0;
   currentRead=0;
+  currentReadsCount=0;
   lastButtonState=digitalRead(PIN_4);
 }
 
@@ -77,7 +80,8 @@ void loop() {
   toggleLEDs(cycles[currentCycle]);
 
   modeSwitch=0;
-  for (currentRead=0; currentRead<READS_PER_CYCLE; currentRead++) {
+  currentReadsCount=analogRead(PIN_3)*MAX_READS_PER_CYCLE/1024;
+  for (currentRead=0; currentRead<currentReadsCount; currentRead++) {
     buttonPressed = digitalRead(PIN_4);
     if (buttonPressed && !lastButtonState) {
       modeSwitch=1;
