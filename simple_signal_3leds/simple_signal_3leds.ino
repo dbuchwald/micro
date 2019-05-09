@@ -6,7 +6,7 @@
 #define ORANGE_LED 2
 #define GREEN_LED 1
 
-#define CYCLE_SLEEP 100
+#define CYCLE_SLEEP 200
 
 #define CYCLES_COUNT 4
 
@@ -25,21 +25,10 @@ void setup() {
 }
 
 void toggleLEDs(int state) {
-  if (state & RED_LED) {
-    digitalWrite(PIN_2, HIGH);
-  } else {
-    digitalWrite(PIN_2, LOW);
-  }
-  if (state & ORANGE_LED) {
-    digitalWrite(PIN_1, HIGH);
-  } else {
-    digitalWrite(PIN_1, LOW);
-  }
-  if (state & GREEN_LED) {
-    digitalWrite(PIN_0, HIGH);
-  } else {
-    digitalWrite(PIN_0, LOW);
-  }
+  
+  digitalWrite(PIN_2, state & RED_LED ? HIGH : LOW);
+  digitalWrite(PIN_1, state & ORANGE_LED ? HIGH : LOW);
+  digitalWrite(PIN_0, state & GREEN_LED ? HIGH : LOW);
 }
 
 void loop() {
